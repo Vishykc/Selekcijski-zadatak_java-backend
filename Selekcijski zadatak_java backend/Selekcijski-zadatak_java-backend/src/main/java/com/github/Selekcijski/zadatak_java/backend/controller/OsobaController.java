@@ -1,4 +1,4 @@
-package controller;
+package com.github.Selekcijski.zadatak_java.backend.controller;
 
 import com.github.Selekcijski.zadatak_java.backend.Model.Osoba;
 import com.github.Selekcijski.zadatak_java.backend.repo.OsobaRepo;
@@ -11,18 +11,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.Long.parseLong;
-
 @RestController
 public class OsobaController {
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     String line = "";
 
@@ -49,18 +49,26 @@ public class OsobaController {
     }
 
     @PostMapping(value = "/addOsobe")
-    public void addOsobe(@RequestBody String name) throws IOException {
+    public ResponseEntity<Object> addOsobe(@RequestBody String name) throws IOException {
+
+        Osoba osobaObj = new Osoba();
+
+        List<String> CSVData = new ArrayList<>();
 
         int i_Ime = -1, i_Prezime = -1, i_DatumRodjenja = -1; //indeksi imena, prezimena i datuma rodjenja
 
         String filePathString = "C:/Selekcijski zadatak_java backend_pomocni_resursi/csv_fajlovi/" +
                 name + ".csv";
 
-        BufferedReader br = new BufferedReader(new FileReader(filePathString)));
+        BufferedReader br = new BufferedReader(new FileReader(filePathString));
 
         while((line = br.readLine()) != null) {
 
-            List<String> CSVData = Arrays.asList(line.split("\\s*,\\s*"));
+            //CSVData.add(Arrays.toString(line.split("\\s*,\\s*"))); //ne radi kako treba
+
+            String[] values = line.split("\\s*,\\s*");
+            List<String> lineList = Arrays.asList(values);
+            CSVData.addAll(lineList);
 
         }
 
@@ -68,14 +76,17 @@ public class OsobaController {
             for(int i = 0; i < CSV_Size; i++) {
                 if (CSVData.get(i).equalsIgnoreCase("ime")) {
                     i_Ime = i;
+                    continue;
                 }
 
                 if (CSVData.get(i).equalsIgnoreCase("prezime")) {
                     i_Prezime = i;
+                    continue;
                 }
 
                 if (CSVData.get(i).equalsIgnoreCase("datumRodjenja")) {
                     i_DatumRodjenja = i;
+                    continue;
                 }
 
                 if(i_Ime > - 1 && i_Prezime > -1 && i_DatumRodjenja > -1) break;
@@ -86,18 +97,34 @@ public class OsobaController {
 
             for(int i = 3; i < CSV_Size; i++) {
 
+
+
                 if(i % 3 == i_Ime) {
+                    osobaObj.setIme(CSVData.get(i));
+                }
+
+                if(i % 3 == i_Prezime) {
+                    osobaObj.setPrezime(CSVData.get(i));
+                }
+
+                if(i % 3 == i_DatumRodjenja) {
+                    LocalDate localDate = LocalDate.parse(CSVData.get(i), formatter);
+                    osobaObj.setDatumRodjenja(localDate);
+                }
+
+                if(osobaObj.getIme() != null && osobaObj.getPrezime() != null && osobaObj.getDatumRodjenja() != null) {
+                    osobaRepo.save(osobaObj);
+
+                    System.out.println(osobaObj);
+
+                    osobaObj = new Osoba();
 
                 }
 
             }
 
 
-
-
-        osobaRepo.save();
-
-        return new ResponseEntity<>(, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
@@ -107,7 +134,5 @@ public class OsobaController {
     public void getOsobaById() {
 
     }
-
-
 
 }
