@@ -21,9 +21,7 @@ import java.util.List;
 
 @RestController
 public class OsobaController {
-
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
     String line = "";
 
     @Autowired
@@ -45,9 +43,9 @@ public class OsobaController {
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
+    //prilikom poziva metode, potrebno je u body staviti tip text te ime csv-a BEZ ekstenzije
     @PostMapping(value = "/addOsobe")
     public ResponseEntity<Object> addOsobe(@RequestBody String name) throws IOException {
 
@@ -57,6 +55,7 @@ public class OsobaController {
 
         int i_Ime = -1, i_Prezime = -1, i_DatumRodjenja = -1; //indeksi imena, prezimena i datuma rodjenja
 
+        //ovaj path se vec kreirao, potrebno je napraviti .csv fajl u njemu
         String filePathString = "C:/Selekcijski zadatak_java backend_pomocni_resursi/csv_fajlovi/" +
                 name + ".csv";
 
@@ -64,14 +63,12 @@ public class OsobaController {
 
         while((line = br.readLine()) != null) {
 
-            //CSVData.add(Arrays.toString(line.split("\\s*,\\s*"))); //ne radi kako treba
-
-            String[] values = line.split("\\s*,\\s*");
-            List<String> lineList = Arrays.asList(values);
+            String[] values = line.split("\\s*,\\s*"); //tekst odvojen opcionalnim whitespace-ovima i obveznim
+            List<String> lineList = Arrays.asList(values);  // zarezom
             CSVData.addAll(lineList);
-
         }
-
+            // pronadi indekse "headera" ime, prezime i datumRodjenja te je za svaki indeks i indeks i + 3 * k, gdje je
+           // k prirodan broj element iz danog headera
             int CSV_Size = CSVData.size();
             for(int i = 0; i < CSV_Size; i++) {
                 if (CSVData.get(i).equalsIgnoreCase("ime")) {
@@ -92,12 +89,8 @@ public class OsobaController {
                 if(i_Ime > - 1 && i_Prezime > -1 && i_DatumRodjenja > -1) break;
             }
 
-
-
-
+            // puni redom osobe te ih ispisuje sad kad znamo indekse headera
             for(int i = 3; i < CSV_Size; i++) {
-
-
 
                 if(i % 3 == i_Ime) {
                     osobaObj.setIme(CSVData.get(i));
@@ -118,21 +111,9 @@ public class OsobaController {
                     System.out.println(osobaObj);
 
                     osobaObj = new Osoba();
-
                 }
-
             }
 
-
-        return new ResponseEntity<>(HttpStatus.OK);
-
+        return new ResponseEntity<>(HttpStatus.OK); // vraca jednostavan status ok iako bi moglo i listu objekata
     }
-
-
-
-    @GetMapping
-    public void getOsobaById() {
-
-    }
-
 }

@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+// pvdje koristim Lombok jer je u drugim firmama bila takva praksa, ali osobno mi se vise svida napisati eksplicitno sve
 @Entity
 @Table(name="Osobe")
 @NoArgsConstructor
@@ -15,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 public class Osoba {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO) //ovdje nije vazna strategija pa stavljam AUTO
     private Long id;
 
     private String ime;
@@ -25,6 +26,7 @@ public class Osoba {
     private LocalDate datumRodjenja;
 
 
+    //override toString-a obzirom da LocalDate po defaultu ispisuje drugi format datuma
     @Override
     public String toString() {
 

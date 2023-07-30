@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 @SpringBootApplication
 public class SelekcijskiZadatakJavaBackendApplication {
 
+	//napravi potrebne foldere za spremanje h2 baze i CSV fajlova na lokalni C disk
 	@PostConstruct
 	private void postConstruct() throws IOException {
 		Files.createDirectories(Paths.get("C:/Selekcijski zadatak_java backend_pomocni_resursi/h2db"));
@@ -21,5 +22,4 @@ public class SelekcijskiZadatakJavaBackendApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SelekcijskiZadatakJavaBackendApplication.class, args);
 	}
-
 }
